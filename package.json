@@ -1,6 +1,6 @@
 {
   "name": "cf-auth-google",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Drop-in Google OAuth for Cloudflare Workers — sign-in, signed session cookies, email allowlist + profile mapping",
   "type": "module",
   "main": "./src/index.ts",

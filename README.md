@@ -31,6 +31,7 @@ export default {
       allowedEmails: env.ALLOWED_EMAILS.split(","),
       profileMap: JSON.parse(env.PROFILE_MAP),
       sessionCookieDomain: "kryklia.com",
+      appCallbackScheme: "morningedition",
     });
 
     const handled = await auth.handle(req);
@@ -66,6 +67,7 @@ Override paths via `loginPath` / `callbackPath` / `logoutPath`.
 | `cookieName` | no | default `kino_session` |
 | `flowCookieName` | no | default `kino_flow` |
 | `sessionCookieDomain` | no | parent domain used to share the session across sibling apps |
+| `appCallbackScheme` | no | exact native callback scheme allowed as `next`, receiving the signed session token |
 | `sessionMaxAgeSeconds` | no | default 7 days |
 | `origin` | no | override the redirect_uri origin (useful for proxying) |
 
@@ -83,6 +85,7 @@ Override paths via `loginPath` / `callbackPath` / `logoutPath`.
 - ID tokens are verified against Google's JWK set (signature, issuer, audience, expiry, `email_verified`).
 - PKCE (S256) is used for the authorization-code flow — not strictly required for confidential web clients, but doesn't hurt and prepares for future SPA usage.
 - The flow cookie carries state + PKCE verifier and is cleared on success.
+- Browser returns are restricted to same-origin paths; a configured native callback receives the session through its exact `scheme://auth` URL for system-browser login.
 - `protect()` redirects browsers to `/auth/login`; API/JSON callers get `401 Unauthorized`.
 
 ## Testing
@@ -91,4 +94,4 @@ Override paths via `loginPath` / `callbackPath` / `logoutPath`.
 npm test
 ```
 
-20 tests cover session signing/verification, cookie parsing/serialization, OAuth helpers, and PKCE generation.
+24 tests cover session signing/verification, cookie parsing/serialization, redirect validation, OAuth helpers, and PKCE generation.

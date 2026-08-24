@@ -30,6 +30,7 @@ export default {
       sessionKey: env.SESSION_KEY,
       allowedEmails: env.ALLOWED_EMAILS.split(","),
       profileMap: JSON.parse(env.PROFILE_MAP),
+      sessionCookieDomain: "kryklia.com",
     });
 
     const handled = await auth.handle(req);
@@ -64,6 +65,7 @@ Override paths via `loginPath` / `callbackPath` / `logoutPath`.
 | `logoutPath` | no | default `/auth/logout` |
 | `cookieName` | no | default `kino_session` |
 | `flowCookieName` | no | default `kino_flow` |
+| `sessionCookieDomain` | no | parent domain used to share the session across sibling apps |
 | `sessionMaxAgeSeconds` | no | default 7 days |
 | `origin` | no | override the redirect_uri origin (useful for proxying) |
 
@@ -77,7 +79,7 @@ Override paths via `loginPath` / `callbackPath` / `logoutPath`.
 
 ## Security notes
 
-- Session cookies are HTTP-only, Secure, SameSite=Lax by default.
+- Session cookies are HTTP-only, Secure, SameSite=Lax by default; `sessionCookieDomain` can share them across trusted sibling hosts.
 - ID tokens are verified against Google's JWK set (signature, issuer, audience, expiry, `email_verified`).
 - PKCE (S256) is used for the authorization-code flow — not strictly required for confidential web clients, but doesn't hurt and prepares for future SPA usage.
 - The flow cookie carries state + PKCE verifier and is cleared on success.
@@ -89,4 +91,4 @@ Override paths via `loginPath` / `callbackPath` / `logoutPath`.
 npm test
 ```
 
-18 tests cover session signing/verification, cookie parsing/serialization, OAuth helpers, and PKCE generation.
+20 tests cover session signing/verification, cookie parsing/serialization, OAuth helpers, and PKCE generation.

@@ -24,6 +24,10 @@ describe("cookies", () => {
     expect(serialize("x", "1", { maxAge: 60 })).toContain("Max-Age=60");
   });
 
+  it("includes Domain when set", () => {
+    expect(serialize("x", "1", { domain: "kryklia.com" })).toContain("Domain=kryklia.com");
+  });
+
   it("clearCookie produces Max-Age=0", () => {
     expect(clearCookie("x")).toContain("Max-Age=0");
   });

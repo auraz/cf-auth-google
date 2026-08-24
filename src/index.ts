@@ -8,6 +8,7 @@ import { issue, verify, type SessionPayload } from "./session";
 export type { SessionPayload } from "./session";
 export { AuthError } from "./idtoken";
 export { issue as issueSession, verify as verifySession } from "./session";
+export { parseCookies } from "./cookies";
 
 export type GoogleAuthConfig = {
   clientId: string;
@@ -21,6 +22,7 @@ export type GoogleAuthConfig = {
   sessionMaxAgeSeconds?: number;
   cookieName?: string;
   flowCookieName?: string;
+  sessionCookieDomain?: string;
   origin?: string;
   fetcher?: typeof fetch;
 };
@@ -70,7 +72,7 @@ export function googleAuth(cfg: GoogleAuthConfig): AuthHandle {
   function logoutResponse(): Response {
     return new Response(null, {
       status: 302,
-      headers: { Location: "/", "Set-Cookie": clearCookie(opts.cookieName) },
+      headers: { Location: "/", "Set-Cookie": clearCookie(opts.cookieName, { domain: opts.sessionCookieDomain }) },
     });
   }
 
@@ -146,7 +148,7 @@ export function googleAuth(cfg: GoogleAuthConfig): AuthHandle {
     const exp = Math.floor(Date.now() / 1000) + opts.sessionMaxAgeSeconds;
     const cookie = await issue({ email, profile, exp }, opts.sessionKey);
     const headers = new Headers({ Location: flow.next || "/" });
-    headers.append("Set-Cookie", serialize(opts.cookieName, cookie, { maxAge: opts.sessionMaxAgeSeconds }));
+    headers.append("Set-Cookie", serialize(opts.cookieName, cookie, { domain: opts.sessionCookieDomain, maxAge: opts.sessionMaxAgeSeconds }));
     headers.append("Set-Cookie", clearCookie(opts.flowCookieName));
     return new Response(null, { status: 302, headers });
   }
